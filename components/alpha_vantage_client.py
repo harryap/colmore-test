@@ -1,4 +1,5 @@
 import requests
+import sys
 
 from urllib.parse import urlencode
 from typing import Dict, Any
@@ -28,8 +29,57 @@ class AlphaVantageClient:
         """
         return self._query(function="SYMBOL_SEARCH", keywords=company_name)
     
+    def get_weekly_prices(self, symbol: str) -> Dict[Any, Any]:
+        """
+        Gets weekly prices for a symbol.
+
+        Args:
+            symbol (str): Symbol to get prices for.
+
+        Returns:
+            Dict[Any, Any]: The data returned from the url.
+        """
+        return self._query(function="TIME_SERIES_WEEKLY", symbol=symbol)
+    
+    def get_daily_prices(self, symbol: str) -> Dict[Any, Any]:
+        """
+        Gets daily prices for a symbol.
+
+        Args:
+            symbol (str): Symbol to get prices for.
+
+        Returns:
+            Dict[Any, Any]: The data returned from the url.
+        """
+        return self._query(function="TIME_SERIES_DAILY", symbol=symbol)
+    
+    def get_current_quote(self, symbol: str) -> Dict[Any, Any]:
+        """
+        Gets current quote a symbol.
+
+        Args:
+            symbol (str): Symbol to get quote for.
+
+        Returns:
+            Dict[Any, Any]: The data returned from the url.
+        """
+        return self._query(function="GLOBAL_QUOTE", symbol=symbol)
+    
+    def get_indicators(self, symbol: str) -> Dict[Any, Any]:
+        """
+        Gets indicators for a symbol.
+
+        Args:
+            symbol (str): Symbol to get indicators for.
+
+        Returns:
+            Dict[Any, Any]: The data returned from the url.
+        """
+        return self._query(function="SMA", symbol=symbol, interval="weekly", time_period=10, series_type="open")
+
     def _query(self, **kwargs: str) -> Dict[Any, Any]:
         """
+        Queries alpha vantage with given kwargs.
 
         Args:
             **kwargs (str): kwargs to add to the query. 
@@ -38,8 +88,13 @@ class AlphaVantageClient:
             Dict[Any, Any]: The data returned by the query.
         """
         url = self._generate_query_url(self.base_url, self.api_key, **kwargs)
-        response = requests.get(url)
-        data = response.json()
+        try:
+            response = requests.get(url)
+            data = response.json()
+        except Exception as err:
+            print(f"Unable to retrieve data from {url}")
+            print(f"Error: {err}")
+            sys.exit(0)
         return data
     
     @staticmethod

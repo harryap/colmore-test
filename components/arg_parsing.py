@@ -3,6 +3,7 @@ import argparse
 from typing import List
 from argparse import Namespace
 
+
 def parse_args(args: List[str]) -> Namespace:
     """
     Parses cli args for alpha_vantage_interact.
